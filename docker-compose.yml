@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+    postgres:
+        image: postgres:13
+        container_name: 'postgresql'
+        restart: always
+        environment: 
+          - POSTGRES_USER=smartinfo_web
+          - POSTGRES_PASSWORD=smartinfo.04
+        ports: 
+            - 55004:5432
+        networks:
+            - default
+        volumes: 
+            - postgres-data:/var/lib/postgresql/data
+    www:
+        build: 
+            context: ./
+            dockerfile: ./Dockerfile
+        ports: 
+            - "80:80"
+        container_name: 'php'
+        volumes:
+            - ./www:/var/www/html
+        links:
+            - postgres
+        networks:
+            - default
+    pgadmin:
+        image: dpage/pgadmin4
+        links: 
+            - postgres:postgres
+        restart: always
+        container_name: 'pgadmin'
+        environment:
+            PGADMIN_DEFAULT_EMAIL: "carlos@smartinfo.com.co"
+            PGADMIN_DEFAULT_PASSWORD: "admin"
+        ports:
+            - 8000:80
+        depends_on:
+            - postgres
+volumes:
+    postgres-data: 
